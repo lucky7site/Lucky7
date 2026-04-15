@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Lucky 7 – Page Not Found</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#03030a;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--green:#00ff88;--blue:#00c8ff;--red:#ff4466;--gold:#ffd700;--purple:#b44fff;--orange:#ff8c00;--text:#e8eaf0;--muted:#7a7d8e;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(180,79,255,0.08),transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(0,200,255,0.05),transparent 50%);pointer-events:none;}
+
+/* ── DECOY ── */
+#decoy{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+#decoyNum{font-family:'Poppins',sans-serif;font-size:80px;font-weight:900;color:rgba(255,255,255,0.04);cursor:pointer;user-select:none;}
+#decoy p{color:var(--muted);font-size:14px;}
+#decoy a{color:var(--blue);font-size:13px;cursor:pointer;}
+
+/* ── LOGIN ── */
+#loginScreen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:none;align-items:center;justify-content:center;}
+.login-box{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:24px;padding:32px 24px;width:90%;max-width:320px;text-align:center;box-shadow:0 0 30px rgba(180,79,255,0.1);}
+.login-logo{font-family:'Poppins',sans-serif;font-size:20px;font-weight:800;color:var(--purple);margin-bottom:4px;}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:22px;}
+.login-inp{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'Poppins',sans-serif;font-size:14px;outline:none;margin-bottom:10px;}
+.login-inp:focus{border-color:var(--purple);}
+.login-btn{width:100%;border:none;border-radius:12px;padding:13px;background:linear-gradient(90deg,var(--purple),var(--blue));font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;}
+.login-err{color:var(--red);font-size:12px;margin-top:8px;min-height:18px;}
+
+/* ── HEADER ── */
+.admin-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:rgba(3,3,10,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+.admin-logo{font-family:'Poppins',sans-serif;font-size:14px;font-weight:800;color:var(--purple);display:flex;align-items:center;gap:8px;}
+.admin-badge{background:rgba(180,79,255,0.15);border:1px solid rgba(180,79,255,0.3);border-radius:8px;padding:3px 8px;font-size:10px;color:var(--purple);font-weight:700;}
+.logout-btn{border:1px solid var(--border);background:none;border-radius:9px;padding:5px 12px;color:var(--muted);font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.session-info{font-size:10px;color:var(--muted);}
+
+/* ── TABS ── */
+.tabs{display:flex;overflow-x:auto;gap:0;background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border);scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{flex-shrink:0;padding:12px 14px;font-family:'Poppins',sans-serif;font-size:10px;font-weight:700;cursor:pointer;background:none;border:none;color:var(--muted);transition:.2s;border-bottom:2px solid transparent;white-space:nowrap;}
+.tab-btn.active{color:var(--green);border-bottom:2px solid var(--green);}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;padding:12px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;position:relative;overflow:hidden;}
+.stat-val{font-family:'Poppins',sans-serif;font-size:20px;font-weight:800;}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+.stat-green .stat-val{color:var(--green);}
+.stat-blue .stat-val{color:var(--blue);}
+.stat-gold .stat-val{color:var(--gold);}
+.stat-red .stat-val{color:var(--red);}
+.stat-purple .stat-val{color:var(--purple);}
+.stat-ping{position:absolute;top:10px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+/* ── SECTION ── */
+.section{padding:0 12px 12px;}
+.sec-title{font-family:'Poppins',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:13px 0 10px;display:flex;align-items:center;gap:8px;}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.sec-actions{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;}
+.refresh-btn{border:1px solid rgba(0,255,136,0.25);background:rgba(0,255,136,0.05);color:var(--green);border-radius:8px;padding:5px 12px;font-family:'Poppins',sans-serif;font-size:10px;font-weight:700;cursor:pointer;}
+
+/* ── CARDS ── */
+.req-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:8px;}
+.req-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;}
+.req-id{font-family:'Poppins',sans-serif;font-size:10px;color:var(--muted);}
+.req-body{margin-bottom:11px;}
+.req-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;}
+.req-lbl{color:var(--muted);}
+.req-val{font-weight:600;}
+.req-actions{display:flex;gap:7px;}
+.abtn{flex:1;border:none;border-radius:9px;padding:9px;font-family:'Poppins',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:.2s;}
+.abtn:active{transform:scale(0.95);}
+.approve{background:linear-gradient(90deg,#006644,var(--green));color:#000;}
+.reject{background:linear-gradient(90deg,#880022,var(--red));color:#fff;}
+.sbadge{display:inline-block;border-radius:7px;padding:2px 8px;font-size:10px;font-weight:700;}
+.sb-pending{background:rgba(255,140,0,0.12);color:var(--orange);border:1px solid rgba(255,140,0,0.25);}
+.sb-approved,.sb-won{background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2);}
+.sb-rejected,.sb-lost{background:rgba(255,68,102,0.1);color:var(--red);border:1px solid rgba(255,68,102,0.2);}
+.sb-cashout{background:rgba(255,215,0,0.1);color:var(--gold);border:1px solid rgba(255,215,0,0.2);}
+
+/* ── FORM ── */
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;}
+.form-title{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;}
+.form-group{margin-bottom:12px;}
+.form-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;display:block;}
+.form-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--text);font-family:'Poppins',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:var(--purple);}
+.form-select{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--text);font-family:'Poppins',sans-serif;font-size:13px;outline:none;cursor:pointer;}
+.form-hint{font-size:10px;color:var(--muted);margin-top:4px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* ── MATCH STATUS BADGE ── */
+.status-live{background:rgba(0,255,136,0.12);color:var(--green);border:1px solid rgba(0,255,136,0.25);border-radius:8px;padding:3px 9px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px;}
+.status-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1s infinite;}
+.status-upcoming{background:rgba(255,140,0,0.12);color:var(--orange);border:1px solid rgba(255,140,0,0.25);border-radius:8px;padding:3px 9px;font-size:10px;font-weight:700;}
+
+/* ── MATCH CARD (admin) ── */
+.match-admin-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;}
+.mac-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.mac-title{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;}
+.mac-teams{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.mac-link{font-size:11px;color:var(--blue);word-break:break-all;margin-bottom:10px;}
+.mac-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.mac-btn{border:none;border-radius:8px;padding:7px 12px;font-family:'Poppins',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:.2s;}
+.mac-btn:active{transform:scale(0.95);}
+.btn-live{background:linear-gradient(90deg,#006644,var(--green));color:#000;}
+.btn-del{background:rgba(255,68,102,0.12);color:var(--red);border:1px solid rgba(255,68,102,0.2);}
+.btn-settle{background:linear-gradient(90deg,#7a4400,var(--gold));color:#000;}
+.btn-upcoming{background:rgba(255,140,0,0.12);color:var(--orange);border:1px solid rgba(255,140,0,0.2);}
+
+/* ── SETTLE MODAL ── */
+.settle-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.3s;}
+.settle-overlay.open{opacity:1;pointer-events:all;}
+.settle-box{background:linear-gradient(160deg,#0d0d18,#0a0a14);border:1px solid var(--border);border-radius:22px;padding:26px 20px;width:90%;max-width:340px;text-align:center;}
+.settle-title{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;color:var(--gold);margin-bottom:16px;}
+.settle-match{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.settle-btn-row{display:flex;gap:10px;}
+.settle-team-btn{flex:1;border:none;border-radius:12px;padding:14px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;}
+.settle-team-btn:active{transform:scale(0.96);}
+.settle-t1{background:linear-gradient(90deg,#0066aa,var(--blue));color:#000;}
+.settle-t2{background:linear-gradient(90deg,#880022,var(--red));color:#fff;}
+.settle-cancel{margin-top:10px;background:none;border:1px solid var(--border);border-radius:10px;padding:10px;width:100%;color:var(--muted);font-family:'Poppins',sans-serif;font-size:13px;cursor:pointer;}
+
+/* ── BALANCE ── */
+.bal-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;}
+.bal-title{font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:10px;}
+.current-bal{font-family:'Poppins',sans-serif;font-size:26px;font-weight:800;color:var(--green);margin-bottom:10px;}
+.bal-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
+.bal-input{flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;outline:none;}
+.bal-input:focus{border-color:var(--blue);}
+.bal-btn{border:none;border-radius:9px;padding:9px 16px;font-family:'Poppins',sans-serif;font-size:11px;font-weight:700;cursor:pointer;}
+.badd{background:linear-gradient(90deg,#006644,var(--green));color:#000;}
+.bset{background:linear-gradient(90deg,#0066aa,var(--blue));color:#000;}
+
+/* ── USERS ── */
+.user-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:12px;margin-bottom:7px;}
+.user-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.user-name-d{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;}
+.user-bal-d{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;color:var(--green);}
+.user-sub-d{font-size:11px;color:var(--muted);}
+.user-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.uabtn{border:none;border-radius:8px;padding:7px 12px;font-family:'Poppins',sans-serif;font-size:10px;font-weight:700;cursor:pointer;}
+.uadd{background:rgba(0,255,136,0.12);color:var(--green);border:1px solid rgba(0,255,136,0.2);}
+.uset{background:rgba(0,200,255,0.12);color:var(--blue);border:1px solid rgba(0,200,255,0.2);}
+.uban{background:rgba(255,68,102,0.12);color:var(--red);border:1px solid rgba(255,68,102,0.2);}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:76px;left:50%;transform:translateX(-50%) translateY(-20px);background:rgba(10,10,20,0.97);border:1px solid var(--border);border-radius:13px;padding:9px 18px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;z-index:600;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{border-color:var(--green);color:var(--green);}
+.toast.err{border-color:var(--red);color:var(--red);}
+.toast.info{border-color:var(--blue);color:var(--blue);}
+
+.empty{text-align:center;padding:24px;color:var(--muted);font-size:13px;}
+main{position:relative;z-index:1;padding-bottom:30px;}
+</style>
+</head>
+<body>
+
+<!-- DECOY 404 -->
+<div id="decoy">
+  <div id="decoyNum">404</div>
+  <p>Page not found.</p>
+  <a onclick="location.href='index.html'">Go back to home</a>
+</div>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">⚙️ CONTROL PANEL</div>
+    <div class="login-sub">Authorized access only</div>
+    <input type="text" class="login-inp" id="adminUser" placeholder="Admin ID" autocomplete="off">
+    <input type="password" class="login-inp" id="adminPass" placeholder="Password" autocomplete="off">
+    <button class="login-btn" onclick="doLogin()">ACCESS PANEL</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- SETTLE MODAL -->
+<div class="settle-overlay" id="settleOverlay">
+  <div class="settle-box">
+    <div class="settle-title">🏆 Declare Winner</div>
+    <div class="settle-match" id="settleMatchName">Match name</div>
+    <div class="settle-btn-row">
+      <button class="settle-team-btn settle-t1" id="settleT1Btn" onclick="declareWinner('team1')">—</button>
+      <button class="settle-team-btn settle-t2" id="settleT2Btn" onclick="declareWinner('team2')">—</button>
+    </div>
+    <button class="settle-cancel" onclick="closeSettle()">Cancel</button>
+  </div>
+</div>
+
+<!-- MAIN ADMIN -->
+<div id="adminUI" style="display:none;">
+
+<header class="admin-header">
+  <div class="admin-logo">⚙️ LUCKY7 <span class="admin-badge">ADMIN</span></div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <div class="session-info" id="sessionTimer">00:00</div>
+    <button class="logout-btn" onclick="doLogout()">LOGOUT</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('overview')">📊 OVERVIEW</button>
+  <button class="tab-btn" onclick="switchTab('matches')">🏏 MATCHES</button>
+  <button class="tab-btn" onclick="switchTab('deposits')">📥 DEPOSITS</button>
+  <button class="tab-btn" onclick="switchTab('withdrawals')">📤 WITHDRAWALS</button>
+  <button class="tab-btn" onclick="switchTab('bets')">💸 BETS</button>
+  <button class="tab-btn" onclick="switchTab('users')">👥 USERS</button>
+  <button class="tab-btn" onclick="switchTab('balance')">🪙 BALANCE</button>
+</div>
+
+<main>
+
+<!-- OVERVIEW -->
+<div id="tab-overview">
+  <div class="stats-row">
+    <div class="stat-card stat-green"><div class="stat-ping"></div><div class="stat-val" id="stUsers">0</div><div class="stat-lbl">👥 Users</div></div>
+    <div class="stat-card stat-gold"><div class="stat-val" id="stDepPend">0</div><div class="stat-lbl">📥 Pending Deposits</div></div>
+    <div class="stat-card stat-blue"><div class="stat-val" id="stWdPend">0</div><div class="stat-lbl">📤 Pending Withdrawals</div></div>
+    <div class="stat-card stat-purple"><div class="stat-val" id="stBetsPend">0</div><div class="stat-lbl">💸 Live Bets</div></div>
+    <div class="stat-card stat-green" style="grid-column:span 2"><div class="stat-val" id="stLiveMatch">No live match</div><div class="stat-lbl">🔴 Live Match Now</div></div>
+  </div>
+  <div class="section">
+    <div class="sec-title">⚡ Quick Actions</div>
+    <div class="sec-actions">
+      <button class="refresh-btn" onclick="switchTab('matches')">🏏 Manage Matches</button>
+      <button class="refresh-btn" style="border-color:rgba(255,215,0,0.25);color:var(--gold);background:rgba(255,215,0,0.05);" onclick="switchTab('deposits')">📥 Deposits</button>
+      <button class="refresh-btn" style="border-color:rgba(0,200,255,0.25);color:var(--blue);background:rgba(0,200,255,0.05);" onclick="switchTab('withdrawals')">📤 Withdrawals</button>
+      <button class="refresh-btn" onclick="refreshAll()">🔄 Refresh</button>
+    </div>
+  </div>
+</div>
+
+<!-- MATCHES -->
+<div id="tab-matches" style="display:none;">
+  <div class="section">
+    <div class="sec-title">➕ Add / Edit Match</div>
+
+    <div class="form-card">
+      <div class="form-title">🏏 Match Details</div>
+      <input type="hidden" id="editMatchId">
+
+      <div class="form-group">
+        <label class="form-label">Match Title</label>
+        <input type="text" class="form-input" id="mTitle" placeholder="e.g. MI vs CSK – IPL 2025, Match 14">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Team 1 Name</label>
+          <input type="text" class="form-input" id="mTeam1" placeholder="e.g. MI">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Team 2 Name</label>
+          <input type="text" class="form-input" id="mTeam2" placeholder="e.g. CSK">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Match Date & Time</label>
+        <input type="datetime-local" class="form-input" id="mDatetime">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cricbuzz / Live Scorecard URL</label>
+        <input type="url" class="form-input" id="mScoreLink" placeholder="https://www.cricbuzz.com/live-cricket-scores/...">
+        <div class="form-hint">Paste the Cricbuzz match page link — it will be embedded as a live scoreboard iframe for users.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="mStatus">
+          <option value="upcoming">⏰ Upcoming</option>
+          <option value="live">🔴 Live Now</option>
+        </select>
+        <div class="form-hint">You can have 1 live match + up to 2 upcoming matches at the same time.</div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="abtn approve" style="flex:2" onclick="saveMatch()">💾 SAVE MATCH</button>
+        <button class="abtn" style="flex:1;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid var(--border);" onclick="clearMatchForm()">✕ Clear</button>
+      </div>
+    </div>
+
+    <div class="sec-title">📋 Current Matches <button class="refresh-btn" onclick="renderMatches()">🔄</button></div>
+    <div id="matchesList"></div>
+  </div>
+</div>
+
+<!-- DEPOSITS -->
+<div id="tab-deposits" style="display:none;">
+  <div class="section">
+    <div class="sec-title">📥 Deposit Requests <button class="refresh-btn" onclick="renderDeposits()">🔄</button></div>
+    <div id="depositList"></div>
+  </div>
+</div>
+
+<!-- WITHDRAWALS -->
+<div id="tab-withdrawals" style="display:none;">
+  <div class="section">
+    <div class="sec-title">📤 Withdrawal Requests <button class="refresh-btn" onclick="renderWithdrawals()">🔄</button></div>
+    <div id="withdrawList"></div>
+  </div>
+</div>
+
+<!-- BETS -->
+<div id="tab-bets" style="display:none;">
+  <div class="section">
+    <div class="sec-title">💸 Exchange Bets <button class="refresh-btn" onclick="renderBets()">🔄</button></div>
+    <div id="betsList"></div>
+  </div>
+</div>
+
+<!-- USERS -->
+<div id="tab-users" style="display:none;">
+  <div class="section">
+    <div class="sec-title">👥 Registered Users <button class="refresh-btn" onclick="renderUsers()">🔄</button></div>
+    <div id="usersList"></div>
+  </div>
+</div>
+
+<!-- BALANCE -->
+<div id="tab-balance" style="display:none;">
+  <div class="section">
+    <div class="sec-title">🪙 Manage Balance</div>
+    <div class="bal-card">
+      <div class="bal-title">Select User</div>
+      <div class="bal-row">
+        <select id="balUserSel" class="bal-input" style="cursor:pointer" onchange="refreshBalDisplay()">
+          <option value="">— Select User —</option>
+        </select>
+      </div>
+      <div class="current-bal" id="adminBalDisplay">🪙 —</div>
+      <div class="bal-row">
+        <input type="number" class="bal-input" id="balAmt" placeholder="Amount" min="1">
+        <button class="bal-btn badd" onclick="addBalance()">+ ADD</button>
+        <button class="bal-btn bset" onclick="setBalance()">SET</button>
+      </div>
+      <button class="abtn reject" style="width:100%;margin-top:6px" onclick="resetBalance()">RESET TO 0</button>
+    </div>
+    <div class="sec-title">🗑️ Clear Data</div>
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      <button class="abtn reject" onclick="clearDeposits()">Clear Deposit Requests</button>
+      <button class="abtn reject" onclick="clearWithdrawals()">Clear Withdrawal Requests</button>
+      <button class="abtn reject" onclick="clearBets()">Clear Exchange Bets</button>
+      <button class="abtn reject" onclick="clearMatches()">Clear All Matches</button>
+    </div>
+  </div>
+</div>
+
+</main>
+</div><!-- /adminUI -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// AUTH — credentials base64 encoded
+const _ac = atob('ZXJvdGljNl80');   // erotic6_4
+const _ap = atob('Z2dtbXN4NDJ7'); // ggmmsx42{
+let loginAttempts = 0, lockUntil = 0, sessionStart = 0, sessionTimer = null;
+
+// DECOY — tap 404 five times
+let tapCount = 0, tapReset = null;
+document.getElementById('decoyNum').addEventListener('click', () => {
+  tapCount++;
+  clearTimeout(tapReset);
+  tapReset = setTimeout(() => tapCount = 0, 3000);
+  if (tapCount >= 5) { tapCount = 0; revealLogin(); }
+});
+function revealLogin() {
+  document.getElementById('decoy').style.display = 'none';
+  const ls = document.getElementById('loginScreen');
+  ls.style.display = 'flex';
+}
+
+// Check existing session
+const sess = sessionStorage.getItem('l7_admin_sess');
+if (sess) {
+  try {
+    const s = JSON.parse(sess);
+    if (s.exp > Date.now()) {
+      document.getElementById('decoy').style.display = 'none';
+      document.getElementById('adminUI').style.display = 'block';
+      document.title = 'Lucky 7 – Admin';
+      sessionStart = s.time; startSessionTimer(); refreshAll();
+    } else sessionStorage.removeItem('l7_admin_sess');
+  } catch(e) { sessionStorage.removeItem('l7_admin_sess'); }
+}
+
+function doLogin() {
+  const now = Date.now();
+  if (now < lockUntil) { document.getElementById('loginErr').textContent = '⏳ Locked. Try again later.'; return; }
+  const u = document.getElementById('adminUser').value;
+  const p = document.getElementById('adminPass').value;
+  if (u === _ac && p === _ap) {
+    loginAttempts = 0;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminUI').style.display = 'block';
+    document.title = 'Lucky 7 – Admin';
+    sessionStart = Date.now();
+    sessionStorage.setItem('l7_admin_sess', JSON.stringify({ time: sessionStart, exp: sessionStart + 3600000 }));
+    startSessionTimer(); refreshAll();
+  } else {
+    loginAttempts++;
+    document.getElementById('loginErr').textContent = '❌ Wrong credentials (' + loginAttempts + '/5)';
+    if (loginAttempts >= 5) { lockUntil = Date.now() + 300000; document.getElementById('loginErr').textContent = '🚫 Locked 5 minutes'; }
+  }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('loginScreen').style.display === 'flex') doLogin(); });
+
+function doLogout() {
+  sessionStorage.removeItem('l7_admin_sess');
+  document.getElementById('adminUI').style.display = 'none';
+  document.getElementById('decoy').style.display = 'flex';
+  document.title = 'Lucky 7 – Page Not Found';
+  if (sessionTimer) clearInterval(sessionTimer);
+}
+function startSessionTimer() {
+  if (sessionTimer) clearInterval(sessionTimer);
+  sessionTimer = setInterval(() => {
+    const e = Math.floor((Date.now() - sessionStart) / 1000);
+    document.getElementById('sessionTimer').textContent = Math.floor(e/60).toString().padStart(2,'0') + ':' + (e%60).toString().padStart(2,'0');
+    if (e >= 3600) doLogout();
+  }, 1000);
+}
+
+// ══════════════════════════════════════════
+// TABS
+const TAB_IDS = ['overview','matches','deposits','withdrawals','bets','users','balance'];
+function switchTab(id) {
+  TAB_IDS.forEach(t => { document.getElementById('tab-' + t).style.display = t === id ? 'block' : 'none'; });
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', TAB_IDS[i] === id));
+  if (id === 'deposits') renderDeposits();
+  if (id === 'withdrawals') renderWithdrawals();
+  if (id === 'bets') renderBets();
+  if (id === 'users') renderUsers();
+  if (id === 'matches') renderMatches();
+  if (id === 'balance') { refreshAll(); refreshBalDisplay(); }
+}
+
+// ══════════════════════════════════════════
+// DATA HELPERS
+function getUsers() { return JSON.parse(localStorage.getItem('l7_users') || '[]'); }
+function getDeposits() { return JSON.parse(localStorage.getItem('l7_deposit_queue') || '[]'); }
+function getWithdrawals() { return JSON.parse(localStorage.getItem('l7_withdraw_queue') || '[]'); }
+function getAdminMatches() { return JSON.parse(localStorage.getItem('l7_admin_matches') || '[]'); }
+function getExchangeBets() { return JSON.parse(localStorage.getItem('l7_exchange_bets') || '[]'); }
+function saveAdminMatches(d) { localStorage.setItem('l7_admin_matches', JSON.stringify(d)); }
+function saveUsers(d) { localStorage.setItem('l7_users', JSON.stringify(d)); }
+
+// ══════════════════════════════════════════
+// OVERVIEW REFRESH
+function refreshAll() {
+  const users = getUsers(), deps = getDeposits(), wds = getWithdrawals(), bets = getExchangeBets(), matches = getAdminMatches();
+  document.getElementById('stUsers').textContent = users.length;
+  document.getElementById('stDepPend').textContent = deps.filter(d => d.status === 'pending').length;
+  document.getElementById('stWdPend').textContent = wds.filter(d => d.status === 'pending').length;
+  document.getElementById('stBetsPend').textContent = bets.filter(b => b.status === 'live').length;
+  const live = matches.find(m => m.status === 'live');
+  document.getElementById('stLiveMatch').textContent = live ? live.team1 + ' vs ' + live.team2 : 'No live match';
+  // Populate balance user select
+  const sel = document.getElementById('balUserSel');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select User —</option>';
+  users.forEach(u => { const o = document.createElement('option'); o.value = u.id; o.textContent = u.username + ' (🪙' + (u.balance || 0) + ')'; sel.appendChild(o); });
+  if (cur) sel.value = cur;
+}
+
+// ══════════════════════════════════════════
+// MATCHES MANAGEMENT
+let settleTargetMatchId = null;
+
+function saveMatch() {
+  const title = document.getElementById('mTitle').value.trim();
+  const team1 = document.getElementById('mTeam1').value.trim();
+  const team2 = document.getElementById('mTeam2').value.trim();
+  const datetime = document.getElementById('mDatetime').value;
+  const scoreLink = document.getElementById('mScoreLink').value.trim();
+  const status = document.getElementById('mStatus').value;
+  const editId = document.getElementById('editMatchId').value;
+
+  if (!title || !team1 || !team2) { showToast('Fill Title, Team1, Team2 at minimum', 'err'); return; }
+
+  let matches = getAdminMatches();
+
+  // Enforce limits: 1 live + 2 upcoming
+  const liveCount = matches.filter(m => m.status === 'live' && m.id !== editId).length;
+  const upcomingCount = matches.filter(m => m.status === 'upcoming' && m.id !== editId).length;
+
+  if (status === 'live' && liveCount >= 1) {
+    showToast('Only 1 live match allowed at a time! Set previous live to upcoming first.', 'err');
+    return;
+  }
+  if (status === 'upcoming' && upcomingCount >= 2) {
+    showToast('Max 2 upcoming matches allowed! Remove one first.', 'err');
+    return;
+  }
+
+  if (editId) {
+    // Edit existing
+    const idx = matches.findIndex(m => m.id === editId);
+    if (idx > -1) {
+      matches[idx] = { ...matches[idx], title, team1, team2, datetime, scoreLink, status };
+      showToast('Match updated!', 'ok');
+    }
+  } else {
+    // New match
+    matches.push({
+      id: 'm' + Date.now(),
+      title, team1, team2, datetime, scoreLink, status,
+      odds: { back1: 1.90, back2: 1.90 },
+      createdAt: Date.now()
+    });
+    showToast('Match added! Users can see it now.', 'ok');
+  }
+
+  saveAdminMatches(matches);
+  clearMatchForm();
+  renderMatches();
+  refreshAll();
+}
+
+function clearMatchForm() {
+  document.getElementById('editMatchId').value = '';
+  document.getElementById('mTitle').value = '';
+  document.getElementById('mTeam1').value = '';
+  document.getElementById('mTeam2').value = '';
+  document.getElementById('mDatetime').value = '';
+  document.getElementById('mScoreLink').value = '';
+  document.getElementById('mStatus').value = 'upcoming';
+}
+
+function editMatch(id) {
+  const m = getAdminMatches().find(x => x.id === id);
+  if (!m) return;
+  document.getElementById('editMatchId').value = m.id;
+  document.getElementById('mTitle').value = m.title || '';
+  document.getElementById('mTeam1').value = m.team1 || '';
+  document.getElementById('mTeam2').value = m.team2 || '';
+  document.getElementById('mDatetime').value = m.datetime || '';
+  document.getElementById('mScoreLink').value = m.scoreLink || '';
+  document.getElementById('mStatus').value = m.status || 'upcoming';
+  // Scroll to form
+  document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+function setMatchStatus(id, status) {
+  const matches = getAdminMatches();
+  if (status === 'live') {
+    const liveCount = matches.filter(m => m.status === 'live' && m.id !== id).length;
+    if (liveCount >= 1) { showToast('Only 1 live match at a time!', 'err'); return; }
+  }
+  const idx = matches.findIndex(m => m.id === id);
+  if (idx > -1) { matches[idx].status = status; saveAdminMatches(matches); renderMatches(); refreshAll(); showToast('Status updated!', 'ok'); }
+}
+
+function deleteMatch(id) {
+  if (!confirm('Delete this match? All live bets will remain as-is.')) return;
+  let matches = getAdminMatches();
+  matches = matches.filter(m => m.id !== id);
+  saveAdminMatches(matches);
+  renderMatches(); refreshAll();
+  showToast('Match deleted', 'err');
+}
+
+function openSettle(id) {
+  const m = getAdminMatches().find(x => x.id === id);
+  if (!m) return;
+  settleTargetMatchId = id;
+  document.getElementById('settleMatchName').textContent = m.title || m.team1 + ' vs ' + m.team2;
+  document.getElementById('settleT1Btn').textContent = '🏆 ' + m.team1 + ' WON';
+  document.getElementById('settleT2Btn').textContent = '🏆 ' + m.team2 + ' WON';
+  document.getElementById('settleOverlay').classList.add('open');
+}
+
+function closeSettle() {
+  document.getElementById('settleOverlay').classList.remove('open');
+  settleTargetMatchId = null;
+}
+
+function declareWinner(winnerKey) {
+  if (!settleTargetMatchId) return;
+  const matches = getAdminMatches();
+  const match = matches.find(m => m.id === settleTargetMatchId);
+  if (!match) return;
+
+  const winnerName = winnerKey === 'team1' ? match.team1 : match.team2;
+
+  // Save settlement record — users will pick this up on next poll
+  const settlements = JSON.parse(localStorage.getItem('l7_settlements') || '[]');
+  // Remove old settlement for same match
+  const filtered = settlements.filter(s => s.matchId !== settleTargetMatchId);
+  filtered.push({ matchId: settleTargetMatchId, winnerKey, winnerName, time: Date.now(), processedUserIds: [] });
+  localStorage.setItem('l7_settlements', JSON.stringify(filtered));
+
+  // Also settle bets in admin view
+  const bets = getExchangeBets();
+  const users = getUsers();
+  let winsCount = 0, lossCount = 0;
+
+  bets.forEach(bet => {
+    if (bet.matchId !== settleTargetMatchId || bet.status !== 'live') return;
+    if (bet.teamKey === winnerKey) {
+      bet.status = 'won';
+      // Add profit to user balance
+      const ui = users.findIndex(u => u.id === bet.userId);
+      if (ui > -1) { users[ui].balance = (users[ui].balance || 0) + bet.stake + bet.profit; }
+      winsCount++;
+    } else {
+      bet.status = 'lost';
+      lossCount++;
+    }
+  });
+
+  saveUsers(users);
+  localStorage.setItem('l7_exchange_bets', JSON.stringify(bets));
+
+  // Mark match as completed
+  const mi = matches.findIndex(m => m.id === settleTargetMatchId);
+  if (mi > -1) { matches[mi].status = 'completed'; matches[mi].winner = winnerName; }
+  saveAdminMatches(matches);
+
+  closeSettle();
+  renderMatches(); renderBets(); refreshAll();
+  showToast('✅ ' + winnerName + ' declared winner. ' + winsCount + ' won, ' + lossCount + ' lost.', 'ok');
+}
+
+function renderMatches() {
+  const list = document.getElementById('matchesList');
+  const matches = getAdminMatches();
+  if (!matches.length) {
+    list.innerHTML = '<div class="empty">No matches added yet. Use the form above to add a match.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  matches.forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'match-admin-card';
+    let statusBadge = '';
+    if (m.status === 'live') statusBadge = '<span class="status-live">LIVE</span>';
+    else if (m.status === 'upcoming') statusBadge = '<span class="status-upcoming">UPCOMING</span>';
+    else statusBadge = '<span class="sbadge sb-approved">COMPLETED</span>';
+
+    const bets = getExchangeBets().filter(b => b.matchId === m.id);
+    const liveBets = bets.filter(b => b.status === 'live').length;
+
+    el.innerHTML = `
+      <div class="mac-header">
+        <div>
+          <div class="mac-title">${m.title || m.team1 + ' vs ' + m.team2}</div>
+          <div class="mac-teams">${m.team1} vs ${m.team2} | ${m.datetime ? new Date(m.datetime).toLocaleString() : 'No date set'}</div>
+        </div>
+        ${statusBadge}
+      </div>
+      ${m.scoreLink ? `<div class="mac-link">📺 ${m.scoreLink.substring(0, 60)}${m.scoreLink.length > 60 ? '...' : ''}</div>` : ''}
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Live bets: <strong style="color:var(--gold)">${liveBets}</strong> | Total bets: ${bets.length} ${m.winner ? '| 🏆 Winner: ' + m.winner : ''}</div>
+      <div class="mac-actions">
+        ${m.status !== 'live' && m.status !== 'completed' ? `<button class="mac-btn btn-live" onclick="setMatchStatus('${m.id}','live')">🔴 Set LIVE</button>` : ''}
+        ${m.status === 'live' ? `<button class="mac-btn btn-upcoming" onclick="setMatchStatus('${m.id}','upcoming')">⏰ Set Upcoming</button>` : ''}
+        ${m.status !== 'completed' ? `<button class="mac-btn btn-settle" onclick="openSettle('${m.id}')">🏆 Declare Winner</button>` : ''}
+        <button class="mac-btn" style="background:rgba(180,79,255,0.12);color:var(--purple);border:1px solid rgba(180,79,255,0.2);" onclick="editMatch('${m.id}')">✏️ Edit</button>
+        <button class="mac-btn btn-del" onclick="deleteMatch('${m.id}')">🗑️ Delete</button>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+// ══════════════════════════════════════════
+// DEPOSITS
+function renderDeposits() {
+  const list = document.getElementById('depositList');
+  const deps = getDeposits();
+  if (!deps.length) { list.innerHTML = '<div class="empty">No deposit requests</div>'; return; }
+  list.innerHTML = '';
+  [...deps].reverse().forEach((d, i) => {
+    const idx = deps.length - 1 - i;
+    const el = document.createElement('div'); el.className = 'req-card';
+    el.innerHTML = `<div class="req-top">
+      <div><div class="req-id">#${d.id.slice(-10)}</div><div style="font-size:11px;color:var(--muted)">User: ${d.user || '—'}</div></div>
+      <span class="sbadge sb-${d.status}">${d.status.toUpperCase()}</span>
+    </div>
+    <div class="req-body">
+      <div class="req-row"><span class="req-lbl">Amount</span><span class="req-val" style="color:var(--green)">₹${d.amount}</span></div>
+      <div class="req-row"><span class="req-lbl">UTR/TXN</span><span class="req-val">${d.txn}</span></div>
+      <div class="req-row"><span class="req-lbl">Time</span><span class="req-val">${d.time}</span></div>
+    </div>
+    ${d.status === 'pending' ? `<div class="req-actions">
+      <button class="abtn approve" onclick="approveDeposit(${idx})">✅ APPROVE</button>
+      <button class="abtn reject" onclick="rejectDeposit(${idx})">❌ REJECT</button>
+    </div>` : '<div style="font-size:11px;color:var(--muted)">Processed</div>'}`;
+    list.appendChild(el);
+  });
+}
+function approveDeposit(idx) {
+  const deps = getDeposits(); const d = deps[idx];
+  if (!d || d.status !== 'pending') return;
+  const coins = parseInt(d.amount) || 0;
+  const users = getUsers(); const ui = users.findIndex(u => u.id === d.userId || u.username === d.user);
+  if (ui > -1) { users[ui].balance = (users[ui].balance || 0) + coins; saveUsers(users); }
+  syncActiveUserBal(d.userId, users);
+  d.status = 'approved'; localStorage.setItem('l7_deposit_queue', JSON.stringify(deps));
+  renderDeposits(); refreshAll(); showToast('+' + coins + ' coins added to ' + d.user, 'ok');
+}
+function rejectDeposit(idx) {
+  const deps = getDeposits(); if (!deps[idx]) return;
+  deps[idx].status = 'rejected'; localStorage.setItem('l7_deposit_queue', JSON.stringify(deps));
+  renderDeposits(); refreshAll(); showToast('Deposit rejected', 'err');
+}
+
+// ══════════════════════════════════════════
+// WITHDRAWALS
+function renderWithdrawals() {
+  const list = document.getElementById('withdrawList');
+  const wds = JSON.parse(localStorage.getItem('l7_withdraw_queue') || '[]');
+  if (!wds.length) { list.innerHTML = '<div class="empty">No withdrawal requests</div>'; return; }
+  list.innerHTML = '';
+  [...wds].reverse().forEach((w, i) => {
+    const idx = wds.length - 1 - i;
+    const el = document.createElement('div'); el.className = 'req-card';
+    el.innerHTML = `<div class="req-top">
+      <div><div class="req-id">#${w.id.slice(-10)}</div><div style="font-size:11px;color:var(--muted)">User: ${w.user || '—'}</div></div>
+      <span class="sbadge sb-${w.status}">${w.status.toUpperCase()}</span>
+    </div>
+    <div class="req-body">
+      <div class="req-row"><span class="req-lbl">Coins</span><span class="req-val" style="color:var(--blue)">🪙${w.coins}</span></div>
+      <div class="req-row"><span class="req-lbl">UPI</span><span class="req-val">${w.upi}</span></div>
+      <div class="req-row"><span class="req-lbl">Name</span><span class="req-val">${w.name}</span></div>
+      <div class="req-row"><span class="req-lbl">Time</span><span class="req-val">${w.time}</span></div>
+    </div>
+    ${w.status === 'pending' ? `<div class="req-actions">
+      <button class="abtn approve" onclick="approveWithdraw(${idx})">✅ PAID</button>
+      <button class="abtn reject" onclick="rejectWithdraw(${idx})">❌ REJECT & REFUND</button>
+    </div>` : '<div style="font-size:11px;color:var(--muted)">Processed</div>'}`;
+    list.appendChild(el);
+  });
+}
+function approveWithdraw(idx) {
+  const wds = JSON.parse(localStorage.getItem('l7_withdraw_queue') || '[]');
+  if (!wds[idx]) return; wds[idx].status = 'approved';
+  localStorage.setItem('l7_withdraw_queue', JSON.stringify(wds));
+  renderWithdrawals(); refreshAll(); showToast('Marked as paid', 'ok');
+}
+function rejectWithdraw(idx) {
+  const wds = JSON.parse(localStorage.getItem('l7_withdraw_queue') || '[]');
+  const w = wds[idx]; if (!w || w.status !== 'pending') return;
+  const users = getUsers(); const ui = users.findIndex(u => u.id === w.userId || u.username === w.user);
+  if (ui > -1) { users[ui].balance = (users[ui].balance || 0) + w.coins; saveUsers(users); }
+  syncActiveUserBal(w.userId, users);
+  w.status = 'rejected'; localStorage.setItem('l7_withdraw_queue', JSON.stringify(wds));
+  renderWithdrawals(); refreshAll(); showToast('Rejected — coins refunded', 'err');
+}
+
+// ══════════════════════════════════════════
+// EXCHANGE BETS
+function renderBets() {
+  const list = document.getElementById('betsList');
+  const bets = getExchangeBets();
+  if (!bets.length) { list.innerHTML = '<div class="empty">No exchange bets yet</div>'; return; }
+  list.innerHTML = '';
+  [...bets].reverse().forEach(b => {
+    const el = document.createElement('div'); el.className = 'req-card';
+    el.innerHTML = `<div class="req-top">
+      <div><div class="req-id">#${b.id.slice(-8)}</div><div style="font-size:11px;color:var(--muted)">${b.matchTitle}</div></div>
+      <span class="sbadge sb-${b.status}">${b.status.toUpperCase()}</span>
+    </div>
+    <div class="req-body">
+      <div class="req-row"><span class="req-lbl">BACK</span><span class="req-val">${b.team} @ ${b.odds.toFixed(2)}</span></div>
+      <div class="req-row"><span class="req-lbl">Stake</span><span class="req-val">🪙${b.stake}</span></div>
+      <div class="req-row"><span class="req-lbl">Profit</span><span class="req-val" style="color:var(--green)">+${b.profit}</span></div>
+      <div class="req-row"><span class="req-lbl">Time</span><span class="req-val">${b.date} ${b.time}</span></div>
+    </div>`;
+    list.appendChild(el);
+  });
+}
+
+// ══════════════════════════════════════════
+// USERS
+function renderUsers() {
+  const list = document.getElementById('usersList');
+  const users = getUsers();
+  if (!users.length) { list.innerHTML = '<div class="empty">No users registered</div>'; return; }
+  list.innerHTML = '';
+  users.forEach((u, idx) => {
+    const el = document.createElement('div'); el.className = 'user-card';
+    el.innerHTML = `<div class="user-head">
+      <div><div class="user-name-d">👤 ${u.username}</div><div class="user-sub-d">📱 +91${u.phone} | ${u.joinDate}</div></div>
+      <div class="user-bal-d">🪙${u.balance || 0}</div>
+    </div>
+    <div class="user-actions">
+      <button class="uabtn uadd" onclick="quickAdd(${idx},100)">+100</button>
+      <button class="uabtn uadd" onclick="quickAdd(${idx},500)">+500</button>
+      <button class="uabtn uadd" onclick="quickAdd(${idx},1000)">+1K</button>
+      <button class="uabtn uset" onclick="switchToBalance('${u.id}')">Manage</button>
+      <button class="uabtn uban" onclick="deleteUser(${idx})">Delete</button>
+    </div>`;
+    list.appendChild(el);
+  });
+}
+function quickAdd(idx, amt) {
+  const users = getUsers(); users[idx].balance = (users[idx].balance || 0) + amt; saveUsers(users);
+  syncActiveUserBal(users[idx].id, users); renderUsers(); refreshAll();
+  showToast('+' + amt + ' added to ' + users[idx].username, 'ok');
+}
+function deleteUser(idx) {
+  if (!confirm('Delete this user?')) return;
+  const users = getUsers(); users.splice(idx, 1); saveUsers(users);
+  renderUsers(); refreshAll(); showToast('User deleted', 'err');
+}
+function switchToBalance(uid) { switchTab('balance'); setTimeout(() => { document.getElementById('balUserSel').value = uid; refreshBalDisplay(); }, 100); }
+
+// ══════════════════════════════════════════
+// BALANCE
+function refreshBalDisplay() {
+  const uid = document.getElementById('balUserSel').value;
+  if (!uid) { document.getElementById('adminBalDisplay').textContent = '🪙 —'; return; }
+  const u = getUsers().find(x => x.id === uid);
+  document.getElementById('adminBalDisplay').textContent = '🪙 ' + (u ? u.balance || 0 : '—');
+}
+function getSelUser() {
+  const uid = document.getElementById('balUserSel').value;
+  if (!uid) { showToast('Select a user', 'info'); return null; }
+  const users = getUsers(); return { users, uid, idx: users.findIndex(u => u.id === uid) };
+}
+function addBalance() {
+  const amt = parseInt(document.getElementById('balAmt').value) || 0;
+  if (amt <= 0) { showToast('Enter valid amount', 'err'); return; }
+  const s = getSelUser(); if (!s) return;
+  s.users[s.idx].balance = (s.users[s.idx].balance || 0) + amt; saveUsers(s.users);
+  syncActiveUserBal(s.uid, s.users); refreshBalDisplay(); refreshAll(); showToast('+' + amt + ' added', 'ok');
+}
+function setBalance() {
+  const amt = parseInt(document.getElementById('balAmt').value);
+  if (isNaN(amt)) { showToast('Enter amount', 'err'); return; }
+  const s = getSelUser(); if (!s) return;
+  s.users[s.idx].balance = amt; saveUsers(s.users);
+  syncActiveUserBal(s.uid, s.users); refreshBalDisplay(); refreshAll(); showToast('Balance set to ' + amt, 'ok');
+}
+function resetBalance() {
+  if (!confirm('Reset to 0?')) return;
+  const s = getSelUser(); if (!s) return;
+  s.users[s.idx].balance = 0; saveUsers(s.users);
+  syncActiveUserBal(s.uid, s.users); refreshBalDisplay(); refreshAll(); showToast('Reset to 0', 'ok');
+}
+function syncActiveUserBal(uid, users) {
+  const cur = JSON.parse(localStorage.getItem('l7_current_user') || '{}');
+  if (cur.id === uid) { const u = users.find(x => x.id === uid); if (u) localStorage.setItem('l7_balance', String(u.balance || 0)); }
+}
+
+// ══════════════════════════════════════════
+// CLEAR
+function clearDeposits() { if(confirm('Clear deposits?')){ localStorage.setItem('l7_deposit_queue','[]'); renderDeposits(); showToast('Cleared','ok'); }}
+function clearWithdrawals() { if(confirm('Clear withdrawals?')){ localStorage.setItem('l7_withdraw_queue','[]'); renderWithdrawals(); showToast('Cleared','ok'); }}
+function clearBets() { if(confirm('Clear exchange bets?')){ localStorage.setItem('l7_exchange_bets','[]'); renderBets(); showToast('Cleared','ok'); }}
+function clearMatches() { if(confirm('Delete ALL matches?')){ saveAdminMatches([]); renderMatches(); refreshAll(); showToast('Matches cleared','ok'); }}
+
+// ══════════════════════════════════════════
+// TOAST
+function showToast(msg, type = 'ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// Auto-refresh every 12s
+setInterval(() => { if (document.getElementById('tab-overview').style.display !== 'none') refreshAll(); }, 12000);
+</script>
+</body>
+</html>
+
